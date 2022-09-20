@@ -48,15 +48,17 @@ uart:
 modbus_server:
   - id: modbuserver
     uart_id: intmodbus
-    address: 1
+    address: 1 # slave address
     holding_registers:
-      - offset: 79
-        default: 82
-        number: 10
-        on_read: |
+      - start_address: 79 # starting register range
+        default: 82 # default value for all those registers
+        number: 10 # number of registers in the range
+        on_read: | # called whenever a register in the range is read
+          // 'address' contains the requested register address
+          // 'value' contains the stored register value 
           ESP_LOGI("ON_READ", "This is a lambda. address=%d, value=%d", address, value);
-          return value+1;
-      - offset: 200
+          return value; // you can return the stored value or something else.
+      - start_address: 200 # in this example we map register 200 to a switch
         number: 1
         on_write: |
           if(value)
