@@ -12,7 +12,7 @@ namespace esphome {
 namespace modbus_server {
 using namespace std;
 
-typedef std::function<uint16_t(uint16_t reg, uint16_t val)> cbOnRead;  // Callback function Type
+typedef std::function<uint16_t(uint16_t reg, uint16_t val)> cbOnReadWrite;  // Callback function Type
 
 class ModbusServer : public esphome::uart::UARTDevice, public Component, public Stream {
  public:
@@ -26,7 +26,8 @@ class ModbusServer : public esphome::uart::UARTDevice, public Component, public 
   bool write_holding_register(uint16_t offset, uint16_t value);
   uint16_t read_holding_register(uint16_t offset);
 
-  void on_read_holding_register(uint16_t offset, cbOnRead cb, uint16_t numregs = 1);
+  void on_read_holding_register(uint16_t offset, cbOnReadWrite cb, uint16_t numregs = 1);
+  void on_write_holding_register(uint16_t offset, cbOnReadWrite cb, uint16_t numregs = 1);
 
   // Stream
   size_t write(uint8_t);
