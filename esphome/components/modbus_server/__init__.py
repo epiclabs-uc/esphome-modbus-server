@@ -20,6 +20,7 @@ CONFIG_SCHEMA = (
                         cv.Required("offset"): cv.positive_int,
                         cv.Optional("default", 0): cv.positive_int,
                         cv.Optional("number", 1): cv.positive_int,
+                        cv.Optional("on_read"): cv.returning_lambda,
                     }
                 )
             ),
@@ -47,7 +48,22 @@ async def to_code(config):
                     reg["offset"], reg["default"], reg["number"]
                 )
             )
+            if "on_read" in reg:
+                template_ = await cg.process_lambda(
+                    reg["on_read"],
+                    [
+                        (cg.uint16, "address"),
+                        (cg.uint16, "value"),
+                    ],
+                    return_type=cg.uint16,
+                )
+                cg.add(
+                    server.on_read_holding_register(
+                        reg["offset"], template_, reg["number"]
+                    )
+                )
 
+    # on_read_holding_register
     await cg.register_component(server, config)
 
     return
