@@ -19,6 +19,9 @@ class ModbusServer : public esphome::uart::UARTDevice, public Component, public 
   void setup() override;
   void loop() override;
   uint32_t baudRate();
+  void set_address(uint8_t address);
+  bool add_holding_register(uint16_t offset, uint16_t value, uint16_t numregs);
+  bool set_holding_register(uint16_t offset, uint16_t value);
 
   // Stream
   size_t write(uint8_t);
