@@ -1,6 +1,9 @@
-#include <string.h>
+// This ESPHome component wraps around the modbus-esp8266 by @emelianov:
+// https://github.com/emelianov/modbus-esp8266
+//
+// by @jpeletier - Epic Labs, 2022
+
 #include "modbus_server.h"
-#include "esphome/core/log.h"
 
 #define TAG "ModbusServer"
 
