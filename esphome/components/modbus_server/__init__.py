@@ -3,6 +3,11 @@ import esphome.config_validation as cv
 from esphome.components import uart
 from esphome.const import CONF_ADDRESS, CONF_ID
 
+CONF_OFFSET = "offset"
+CONF_DEFAULT = "default"
+CONF_NUMBER = "number"
+CONF_ON_READ = "on_read"
+CONF_ON_WRITE = "on_write"
 
 modbus_server_ns = cg.esphome_ns.namespace("modbus_server")
 ModbusDeviceComponent = modbus_server_ns.class_("ModbusServer", cg.Component)
@@ -17,11 +22,11 @@ CONFIG_SCHEMA = (
             cv.Optional("holding_registers"): cv.ensure_list(
                 cv.Schema(
                     {
-                        cv.Required("offset"): cv.positive_int,
-                        cv.Optional("default", 0): cv.positive_int,
-                        cv.Optional("number", 1): cv.positive_int,
-                        cv.Optional("on_read"): cv.returning_lambda,
-                        cv.Optional("on_write"): cv.returning_lambda,
+                        cv.Required(CONF_OFFSET): cv.positive_int,
+                        cv.Optional(CONF_DEFAULT, 0): cv.positive_int,
+                        cv.Optional(CONF_NUMBER, 1): cv.positive_int,
+                        cv.Optional(CONF_ON_READ): cv.returning_lambda,
+                        cv.Optional(CONF_ON_WRITE): cv.returning_lambda,
                     }
                 )
             ),
@@ -32,6 +37,7 @@ CONFIG_SCHEMA = (
 )
 
 MULTI_CONF = True
+CODEOWNERS = ["@jpeletier"]
 
 
 async def to_code(config):
@@ -46,12 +52,12 @@ async def to_code(config):
         for reg in config["holding_registers"]:
             cg.add(
                 server.add_holding_register(
-                    reg["offset"], reg["default"], reg["number"]
+                    reg[CONF_OFFSET], reg[CONF_DEFAULT], reg[CONF_NUMBER]
                 )
             )
-            if "on_read" in reg:
+            if CONF_ON_READ in reg:
                 template_ = await cg.process_lambda(
-                    reg["on_read"],
+                    reg[CONF_ON_READ],
                     [
                         (cg.uint16, "address"),
                         (cg.uint16, "value"),
@@ -60,12 +66,12 @@ async def to_code(config):
                 )
                 cg.add(
                     server.on_read_holding_register(
-                        reg["offset"], template_, reg["number"]
+                        reg[CONF_OFFSET], template_, reg[CONF_NUMBER]
                     )
                 )
-            if "on_write" in reg:
+            if CONF_ON_WRITE in reg:
                 template_ = await cg.process_lambda(
-                    reg["on_write"],
+                    reg[CONF_ON_WRITE],
                     [
                         (cg.uint16, "address"),
                         (cg.uint16, "value"),
@@ -74,11 +80,10 @@ async def to_code(config):
                 )
                 cg.add(
                     server.on_write_holding_register(
-                        reg["offset"], template_, reg["number"]
+                        reg[CONF_OFFSET], template_, reg[CONF_NUMBER]
                     )
                 )
 
-    # on_read_holding_register
     await cg.register_component(server, config)
 
     return

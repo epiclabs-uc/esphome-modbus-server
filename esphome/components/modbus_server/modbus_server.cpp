@@ -10,20 +10,7 @@ ModbusServer::ModbusServer() {}
 
 uint32_t ModbusServer::baudRate() { return this->parent_->get_baud_rate(); }
 
-void ModbusServer::setup() {
-  ESP_LOGI(TAG, "setup()");
-  mb.begin(this);
-  mb.addHreg(10);
-  mb.Hreg(10, 79);
-  mb.onGet(HREG(10), [](TRegister *reg, uint16_t val) -> uint16_t {
-    ESP_LOGI(TAG, "Reading something, uh?, %d", val);
-    return val;
-  });
-  mb.onSet(HREG(10), [](TRegister *reg, uint16_t val) -> uint16_t {
-    ESP_LOGI(TAG, "Writing something, uh?, %d", val);
-    return val;
-  });
-}
+void ModbusServer::setup() { mb.begin(this); }
 
 void ModbusServer::set_address(uint8_t address) { mb.slave(address); }
 
