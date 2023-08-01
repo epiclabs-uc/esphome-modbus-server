@@ -24,6 +24,8 @@ class ModbusServer : public esphome::uart::UARTDevice, public Component, public 
  public:
   explicit ModbusServer();
 
+  float get_setup_priority() const override { return esphome::setup_priority::BUS - 1.0f; }
+
   void setup() override;
   void loop() override;
   uint32_t baudRate();  // for compatibility with ModbusRTU lib
